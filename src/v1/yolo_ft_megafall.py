@@ -12,8 +12,8 @@ from ultralytics import YOLO
 BASE_DIR = Path(__file__).resolve().parent
 # 기본 가중치(사전학습)나 재학습할 체크포인트를 이 경로에 지정한다.
 # last.pt를 넘겨주면 아래 로직이 자동으로 resume 모드로 전환된다.
-DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/human-detection/fine_tuning/yolo12n.pt')
-RESUME_WEIGHTS = Path('/Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train23/weights/last.pt')
+DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
+RESUME_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train2/weights/last.pt')
 DATA_CFG = BASE_DIR / 'data.yaml'
 
 from ultralytics.utils.tal import TaskAlignedAssigner

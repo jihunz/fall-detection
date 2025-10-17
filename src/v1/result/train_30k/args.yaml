@@ -1,6 +1,6 @@
 task: detect
 mode: train
-model: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train23/weights/last.pt
+model: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train_30k/weights/last.pt
 data: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/data.yaml
 epochs: 100
 time: null
@@ -13,7 +13,7 @@ cache: ram
 device: mps
 workers: 0
 project: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result
-name: train23
+name: train_30k
 exist_ok: false
 pretrained: true
 optimizer: auto
@@ -24,7 +24,7 @@ single_cls: false
 rect: false
 cos_lr: false
 close_mosaic: 10
-resume: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train23/weights/last.pt
+resume: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train_30k/weights/last.pt
 amp: true
 fraction: 1.0
 profile: false
@@ -103,4 +103,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train23
+save_dir: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train_30k

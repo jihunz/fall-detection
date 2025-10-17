@@ -1,6 +1,6 @@
 path: /Users/jihunjang/Downloads/dataset/train/megafallv2
-train: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/train3.txt
-val: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/val3.txt
+train: /Users/jihunjang/workspace/ust/fall-detection/src/v1/train_50k.txt
+val: /Users/jihunjang/workspace/ust/fall-detection/src/v1/val_50k.txt
 names:
   0: person
   1: fall_person

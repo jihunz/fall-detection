@@ -10,21 +10,22 @@ import numpy as np
 from ultralytics import YOLO
 
 
-BASE_WEIGHTS = Path(
-    "/Users/jihunjang/wozrkspace/ust/human-detection/fine_tuning/v3/result/train2/weights/best.pt"
-)
-DEFAULT_DATA_YAML = Path("/Users/jihunjang/workspace/ust/human-detection/fine_tuning/v3/data.yaml")
-DEFAULT_CONF = 0.25
+BASE_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
+FT_WEIGHTS = Path('/src/v1/result/train_30k/weights/best.pt')
+DATA_YAML = Path("/Users/jihunjang/workspace/ust/fall-detection/src/v1/data.yaml")
+OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/metrics")
+
+DEFAULT_CONF = 0.6
 DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
-OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/human-detection/fine_tuning/benchmark")
 
 
-def _run_validation(weights: Path, data_yaml: Path) -> Dict[str, float]:
+def val(weights: Path, data_yaml: Path) -> Dict[str, float]:
     model = YOLO(str(weights))
     results = model.val(
         data=str(data_yaml),
+        classes=[1],
         conf=DEFAULT_CONF,
         iou=DEFAULT_IOU,
         imgsz=DEFAULT_IMGSZ,
@@ -50,16 +51,18 @@ def _run_validation(weights: Path, data_yaml: Path) -> Dict[str, float]:
     }
 
 
-def benchmark_pair(finetuned_weights: str | Path, data_yaml: str | Path = DEFAULT_DATA_YAML) -> Dict[str, Dict[str, float]]:
+def run_val() -> Dict[str, Dict[str, float]]:
     """Validate baseline and fine-tuned checkpoints on the same dataset."""
-    finetuned_path = Path(finetuned_weights).resolve()
-    data_path = Path(data_yaml).resolve()
-    base_metrics = _run_validation(BASE_WEIGHTS.resolve(), data_path)
-    finetuned_metrics = _run_validation(finetuned_path, data_path)
+    finetuned_path = FT_WEIGHTS.resolve()
+    data_path = DATA_YAML.resolve()
+    base_metrics = val(BASE_WEIGHTS.resolve(), data_path)
+    finetuned_metrics = val(finetuned_path, data_path)
     return {"baseline": base_metrics, "finetuned": finetuned_metrics}
 
 
 def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
+    title = "MegaFallV2 Benchmark"
+
     """Persist metric summary (JSON + plot) under a timestamped directory."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = OUTPUT_ROOT / timestamp
@@ -75,13 +78,23 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     for idx, label in enumerate(labels):
         offset = (idx - (len(labels) - 1) / 2) * width
-        ax.bar(x + offset, values[:, idx], width, label=label)
+        bars = ax.bar(x + offset, values[:, idx], width, label=label)
+        for bar, metric in zip(bars, values[:, idx]):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.01,
+                f"{metric:.3f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+            )
 
     ax.set_xticks(x)
     ax.set_xticklabels([m.upper() for m in metrics])
-    ax.set_ylim(0, 1)
+    upper_ylim = max(1.0, float(values.max()) + 0.05)
+    ax.set_ylim(0, upper_ylim)
     ax.set_ylabel("Score")
-    ax.set_title("YOLO Benchmark")
+    ax.set_title(title)
     ax.legend()
     ax.grid(axis="y", linestyle="--", alpha=0.4)
     fig.tight_layout()
@@ -94,4 +107,6 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     return run_dir
 
 
-__all__ = ["benchmark_pair", "save_benchmark_report"]
+if __name__ == '__main__':
+    result = run_val()
+    save_benchmark_report(result)
