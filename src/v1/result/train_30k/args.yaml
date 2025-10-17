@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/result/train_30k/weights/last.pt
-data: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/data.yaml
+data: /Users/jihunjang/workspace/ust/human-detection/fine_tuning/v4/data_megafall.yaml
 epochs: 100
 time: null
 patience: 20

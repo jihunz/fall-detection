@@ -10,10 +10,10 @@ import numpy as np
 from ultralytics import YOLO
 
 
-BASE_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
+BASE_WEIGHTS = Path('/src/yolo12n.pt')
 FT_WEIGHTS = Path('/src/v1/result/train_30k/weights/best.pt')
-DATA_YAML = Path("/Users/jihunjang/workspace/ust/fall-detection/src/v1/data.yaml")
-OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/metrics")
+DATA_YAML = Path("/src/v1/data_megafall.yaml")
+OUTPUT_ROOT = Path("/src/metrics")
 
 DEFAULT_CONF = 0.6
 DEFAULT_IOU = 0.6

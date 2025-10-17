@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent
 # last.pt를 넘겨주면 아래 로직이 자동으로 resume 모드로 전환된다.
 DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
 RESUME_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train2/weights/last.pt')
-DATA_CFG = BASE_DIR / 'data.yaml'
+DATA_CFG = BASE_DIR / 'data_megafall.yaml'
 
 from ultralytics.utils.tal import TaskAlignedAssigner
 import torch
