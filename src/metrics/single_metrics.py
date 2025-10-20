@@ -24,7 +24,7 @@ DEFAULT_DEVICE = "mps"
 # CLASSES = [1]
 CLASSES = [0]
 # TITLE = "MegaFallV2 Fine-tuned Benchmark: Kisa overseas Fall Person"
-TITLE = "MegaFallV2 Baseline Benchmark: Kisa overseas Fall Person"
+TITLE = "Baseline Benchmark: Kisa overseas Fall Person"
 
 def val(weights: Path, data_yaml: Path) -> Dict[str, float]:
     model = YOLO(str(weights))
@@ -62,7 +62,8 @@ def run_val() -> Dict[str, Dict[str, float]]:
     finetuned_path = FT.resolve()
     data_path = DATA_YAML.resolve()
     finetuned_metrics = val(finetuned_path, data_path)
-    return {"MegaFall YOLO": finetuned_metrics}
+    # return {"MegaFall YOLO12n": finetuned_metrics}
+    return {"Baseline YOLO12n": finetuned_metrics}
 
 
 def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
@@ -80,7 +81,7 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     fig, ax = plt.subplots(figsize=(8, 4.5))
     for idx, label in enumerate(labels):
         offset = (idx - (len(labels) - 1) / 2) * width
-        bars = ax.bar(x + offset, values[:, idx], width, label=label)
+        bars = ax.bar(x + offset, values[:, idx], width, label=label, color='green')
         for bar, metric in zip(bars, values[:, idx]):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
