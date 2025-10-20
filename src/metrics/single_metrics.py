@@ -10,9 +10,9 @@ import numpy as np
 from ultralytics import YOLO
 
 
-BASE_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
-FT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_30k/weights/best.pt')
-DATA_YAML = Path("/src/v1/yamls/data_megafall.yaml")
+# FT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_30k/weights/best.pt')
+FT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
+DATA_YAML = Path("/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_val.yaml")
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 DEFAULT_CONF = 0.6
@@ -20,12 +20,17 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "MegaFallV2 Fine-tuned Benchmark: Fall person"
-CLASSES = [1]
+# 평가 대상 클래스와 plot 제목 설정
+# CLASSES = [1]
+CLASSES = [0]
+# TITLE = "MegaFallV2 Fine-tuned Benchmark: Kisa overseas Fall Person"
+TITLE = "MegaFallV2 Baseline Benchmark: Kisa overseas Fall Person"
 
 def val(weights: Path, data_yaml: Path) -> Dict[str, float]:
     model = YOLO(str(weights))
+
     results = model.val(
+        project='/Users/jihunjang/workspace/ust/fall-detection/src/metrics',
         data=str(data_yaml),
         classes=CLASSES,
         conf=DEFAULT_CONF,
@@ -54,20 +59,15 @@ def val(weights: Path, data_yaml: Path) -> Dict[str, float]:
 
 
 def run_val() -> Dict[str, Dict[str, float]]:
-    """Validate baseline and fine-tuned checkpoints on the same dataset."""
-    finetuned_path = FT_WEIGHTS.resolve()
+    finetuned_path = FT.resolve()
     data_path = DATA_YAML.resolve()
-    base_metrics = val(BASE_WEIGHTS.resolve(), data_path)
     finetuned_metrics = val(finetuned_path, data_path)
-    return {"baseline": base_metrics, "finetuned": finetuned_metrics}
+    return {"MegaFall YOLO": finetuned_metrics}
 
 
 def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
-
-
-    """Persist metric summary (JSON + plot) under a timestamped directory."""
     timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
-    run_dir = OUTPUT_ROOT / timestamp
+    run_dir = OUTPUT_ROOT / f"ft_only_{timestamp}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     metrics = ["precision", "recall", "f1", "map50", "map50_95"]
@@ -75,7 +75,7 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     values = np.array([[results[label][metric] for label in labels] for metric in metrics])
 
     x = np.arange(len(metrics))
-    width = 0.35 if len(labels) == 2 else 0.6
+    width = 0.6
 
     fig, ax = plt.subplots(figsize=(8, 4.5))
     for idx, label in enumerate(labels):

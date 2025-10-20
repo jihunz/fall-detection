@@ -13,8 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent
 # 기본 가중치(사전학습)나 재학습할 체크포인트를 이 경로에 지정한다.
 # last.pt를 넘겨주면 아래 로직이 자동으로 resume 모드로 전환된다.
 DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
-RESUME_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train2/weights/last.pt')
-DATA_CFG = BASE_DIR / 'data_megafall.yaml'
+RESUME_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_100k/weights/last.pt')
+DATA_CFG = BASE_DIR / 'yamls/data_megafall.yaml'
 
 from ultralytics.utils.tal import TaskAlignedAssigner
 import torch
@@ -78,9 +78,11 @@ def run_train(resume: bool | None = None) -> None:
         workers=12,
         cache='ram',
         project=str(BASE_DIR / 'result'),
+        name='train_100k',
         verbose=True,
     )
 
 
 if __name__ == '__main__':
+    # run_train(False) # 초기 학습
     run_train()
