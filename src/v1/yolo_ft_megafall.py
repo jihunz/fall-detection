@@ -19,6 +19,7 @@ DATA_CFG = BASE_DIR / 'yamls/data_megafall.yaml'
 from ultralytics.utils.tal import TaskAlignedAssigner
 import torch
 
+
 def patch_task_aligned_assigner_for_mps():
     if not torch.backends.mps.is_available():
         return
@@ -27,12 +28,14 @@ def patch_task_aligned_assigner_for_mps():
 
     def _forward_mps_safe(self, pd_scores, pd_bboxes, anc_points, gt_labels, gt_bboxes, mask_gt):
         if pd_scores.device.type == "mps":
-            tensors = [t.cpu() if torch.is_tensor(t) else t for t in (pd_scores, pd_bboxes, anc_points, gt_labels, gt_bboxes, mask_gt)]
+            tensors = [t.cpu() if torch.is_tensor(t) else t for t in
+                       (pd_scores, pd_bboxes, anc_points, gt_labels, gt_bboxes, mask_gt)]
             outputs = original_forward(self, *tensors)
             return tuple(out.to("mps") if torch.is_tensor(out) else out for out in outputs)
         return original_forward(self, pd_scores, pd_bboxes, anc_points, gt_labels, gt_bboxes, mask_gt)
 
     TaskAlignedAssigner._forward = _forward_mps_safe
+
 
 patch_task_aligned_assigner_for_mps()
 
@@ -40,7 +43,6 @@ patch_task_aligned_assigner_for_mps()
 def _resolve_weights() -> tuple[Path, bool]:
     """Return (weight_path, resume_flag) deciding automatically when to resume."""
 
-    # 사용자가 RESUME_WEIGHTS를 실제 last.pt로 지정해 두었으면 이를 우선 사용한다.
     if RESUME_WEIGHTS.name == 'last.pt' and RESUME_WEIGHTS.exists():
         # run 디렉터리 하위에 train_args.yaml이 있는지 확인해 resume 가능 여부를 판단한다.
         train_dir = RESUME_WEIGHTS.parent.parent
