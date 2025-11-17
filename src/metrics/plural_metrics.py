@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -11,13 +12,14 @@ from ultralytics import YOLO
 
 
 # ============================================================================
-# 설정: 평가할 모델들 (추가/삭제/수정이 쉬움)
+# 설정: 평가할 모델들
 # ============================================================================
 MODELS = [
     {
         "name": "YOLO12n",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt'),
-        "classes": [1],  # person 평가
+        "classes": [0],  # coco person 라벨로 fall 평가
+        "use_fall0class": True,  # train-fall0class 라벨 사용
     },
     {
         "name": "100k",
@@ -46,18 +48,50 @@ DEFAULT_DEVICE = "mps"
 
 TITLE = "Kisa Overseas Fall person"
 
+
+
+@contextmanager
+def use_fall0class_labels():
+    """
+    Context manager: train-fall0class 라벨을 임시로 train으로 교체
+
+    자동으로 원복되므로 안전합니다.
+    """
+    # 라벨 디렉토리 (fall0class 교체용)
+    LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas/labels")
+    train_dir = LABELS_BASE_DIR / "train"
+    fall0_dir = LABELS_BASE_DIR / "train-fall0class"
+    backup_dir = LABELS_BASE_DIR / "train_backup"
+    cache_file = LABELS_BASE_DIR / "train.cache"
+    
+    # 기존 캐시 삭제 (중요!)
+    if cache_file.exists():
+        print("  [Cache] Deleting train.cache")
+        cache_file.unlink()
+    
+    # 폴더 교체
+    print("  [Label Swap] train -> train_backup")
+    train_dir.rename(backup_dir)
+    print("  [Label Swap] train-fall0class -> train")
+    fall0_dir.rename(train_dir)
+    
+    try:
+        yield
+    finally:
+        # 원복 (에러가 나도 반드시 실행)
+        print("  [Label Swap] Restoring original labels...")
+        train_dir.rename(fall0_dir)
+        backup_dir.rename(train_dir)
+        
+        # 생성된 캐시 삭제 (다음을 위해)
+        if cache_file.exists():
+            print("  [Cache] Deleting generated cache")
+            cache_file.unlink()
+        
+        print("  [Label Swap] Restored!")
+
+
 def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
-    """
-    단일 모델 평가
-    
-    Args:
-        weights: 모델 가중치 경로
-        data_yaml: 데이터셋 YAML 경로
-        classes: 평가할 클래스 리스트 (예: [0] or [1] or [0, 1])
-    
-    Returns:
-        평가 메트릭 딕셔너리
-    """
     model = YOLO(str(weights))
     results = model.val(
         data=str(data_yaml),
@@ -68,6 +102,7 @@ def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
         device=DEFAULT_DEVICE,
         half=False,
         save=False,
+        cache=False,  # 캐시 비활성화 (라벨 폴더 교체 시 필수)
     )
     summary = results.results_dict or {}
 
@@ -89,7 +124,7 @@ def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
 
 def run_val() -> Dict[str, Dict[str, float]]:
     results = {}
-    data_path = DATA_YAML.resolve()
+    data_yaml = DATA_YAML.resolve()
     
     print(f"\n{'='*80}")
     print(f"Running validation on {len(MODELS)} models")
@@ -99,12 +134,21 @@ def run_val() -> Dict[str, Dict[str, float]]:
         name = model_config["name"]
         weights = model_config["weights"].resolve()
         classes = model_config["classes"]
+        use_fall0class = model_config.get("use_fall0class", False)
         
         print(f"[{i}/{len(MODELS)}] Evaluating: {name}")
         print(f"  Weights: {weights.name}")
         print(f"  Classes: {classes}")
+        if use_fall0class:
+            print(f"  Labels: train-fall0class (swapped)")
         
-        metrics = val(weights, data_path, classes)
+        # fall0class 사용 시 자동 교체/원복
+        if use_fall0class:
+            with use_fall0class_labels():
+                metrics = val(weights, data_yaml, classes)
+        else:
+            metrics = val(weights, data_yaml, classes)
+        
         results[name] = metrics
         
         print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
