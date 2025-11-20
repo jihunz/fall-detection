@@ -23,17 +23,22 @@ MODELS = [
     },
     {
         "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_100k/weights/best.pt'),
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k/weights/best.pt'),
         "classes": [1],  # fall_person 평가
     },
     {
         "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_10k/weights/best.pt'),
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k/weights/best.pt'),
         "classes": [1],  # fall_person 평가
     },
     {
         "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_5k/weights/best.pt'),
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k/weights/best.pt'),
+        "classes": [1],  # fall_person 평가
+    },
+    {
+        "name": "2k",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k/weights/best.pt'),
         "classes": [1],  # fall_person 평가
     },
 ]
@@ -46,7 +51,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "Kisa Overseas Fall person"
+TITLE = "FT based on Instances - Kisa Overseas Fall person"
 
 
 
