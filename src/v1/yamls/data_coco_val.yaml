@@ -1,0 +1,5 @@
+path: /Users/jihunjang/Downloads/ust/dataset/train/coco/val2017
+train: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/coco_person_val.txt
+val: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/coco_person_val.txt
+names:
+  0: person

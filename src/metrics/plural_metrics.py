@@ -23,27 +23,32 @@ MODELS = [
     },
     {
         "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k/weights/best.pt'),
-        "classes": [1],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_100k/weights/best.pt'),
+        "classes": [0],  # fall_person 평가
     },
     {
         "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k/weights/best.pt'),
-        "classes": [1],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_10k/weights/best.pt'),
+        "classes": [0],  # fall_person 평가
     },
     {
         "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k/weights/best.pt'),
-        "classes": [1],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_5k/weights/best.pt'),
+        "classes": [0],  # fall_person 평가
     },
-    {
-        "name": "2k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k/weights/best.pt'),
-        "classes": [1],  # fall_person 평가
-    },
+    # {
+    #     "name": "2k",
+    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_2k/weights/best.pt'),
+    #     "classes": [0],  # fall_person 평가
+    # },
+    # {
+    #     "name": "1k",
+    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_1k/weights/best.pt'),
+    #     "classes": [0],  # fall_person 평가
+    # },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_val.yaml')
+DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_coco_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 DEFAULT_CONF = 0.6
@@ -51,7 +56,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "FT based on Instances - Kisa Overseas Fall person"
+TITLE = "FT based on Images - COCO2017 person"
 
 
 
@@ -148,12 +153,13 @@ def run_val() -> Dict[str, Dict[str, float]]:
             print(f"  Labels: train-fall0class (swapped)")
         
         # fall0class 사용 시 자동 교체/원복
-        if use_fall0class:
-            with use_fall0class_labels():
-                metrics = val(weights, data_yaml, classes)
-        else:
-            metrics = val(weights, data_yaml, classes)
-        
+        # if use_fall0class:
+        #     with use_fall0class_labels():
+        #         metrics = val(weights, data_yaml, classes)
+        # else:
+        #     metrics = val(weights, data_yaml, classes)
+        metrics = val(weights, data_yaml, classes)
+
         results[name] = metrics
         
         print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
