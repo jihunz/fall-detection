@@ -11,7 +11,7 @@ from ultralytics import YOLO
 
 
 # FT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_30k/weights/best.pt')
-FT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/yolo12n.pt')
+FT = Path('/src/models/yolo12n.pt')
 DATA_YAML = Path("/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_val.yaml")
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 

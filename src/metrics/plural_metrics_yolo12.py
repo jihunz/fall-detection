@@ -12,93 +12,51 @@ from ultralytics import YOLO
 
 
 # ============================================================================
-# 설정: 평가할 모델들
+# 설정: 평가할 모델들 (YOLOv12 Scale Benchmark)
 # ============================================================================
 MODELS = [
     {
         "name": "YOLO12n",
-        "weights": Path('/src/models/yolo12n.pt'),
-        "classes": [0],  # coco person 라벨로 fall 평가
-        "use_fall0class": True,  # train-fall0class 라벨 사용
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12n.pt'),
+        "classes": [0], 
     },
     {
-        "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_100k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "name": "YOLO12s",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12s.pt'),
+        "classes": [0],
     },
     {
-        "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_10k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "name": "YOLO12m",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12m.pt'),
+        "classes": [0],
     },
     {
-        "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_5k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "name": "YOLO12l",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12l.pt'),
+        "classes": [0],
     },
-    # {
-    #     "name": "2k",
-    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_2k/weights/best.pt'),
-    #     "classes": [0],  # fall_person 평가
-    # },
-    # {
-    #     "name": "1k",
-    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_1k/weights/best.pt'),
-    #     "classes": [0],  # fall_person 평가
-    # },
+    {
+        "name": "YOLO12x",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12x.pt'),
+        "classes": [0],
+    },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_coco_val.yaml')
-OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
+DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
+OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics/yolo12_benchmark")
+# Ensure output root exists
+OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
+DEFAULT_CONF = 0.001 # Low conf for PR curve calculation usually, but metrics returns best f1 at given conf. 
+# Using 0.001 is standard for calculating mAP, but val() function uses specific conf.
+# The original script used 0.6. I will stick to the original script's default unless I see reason to change.
+# Original: DEFAULT_CONF = 0.6
 DEFAULT_CONF = 0.6
 DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "FT based on Images - COCO2017 person"
-
-
-
-@contextmanager
-def use_fall0class_labels():
-    """
-    Context manager: train-fall0class 라벨을 임시로 train으로 교체
-
-    자동으로 원복되므로 안전합니다.
-    """
-    # 라벨 디렉토리 (fall0class 교체용)
-    LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas/labels")
-    train_dir = LABELS_BASE_DIR / "train"
-    fall0_dir = LABELS_BASE_DIR / "train-fall0class"
-    backup_dir = LABELS_BASE_DIR / "train_backup"
-    cache_file = LABELS_BASE_DIR / "train.cache"
-    
-    # 기존 캐시 삭제 (중요!)
-    if cache_file.exists():
-        print("  [Cache] Deleting train.cache")
-        cache_file.unlink()
-    
-    # 폴더 교체
-    print("  [Label Swap] train -> train_backup")
-    train_dir.rename(backup_dir)
-    print("  [Label Swap] train-fall0class -> train")
-    fall0_dir.rename(train_dir)
-    
-    try:
-        yield
-    finally:
-        # 원복 (에러가 나도 반드시 실행)
-        print("  [Label Swap] Restoring original labels...")
-        train_dir.rename(fall0_dir)
-        backup_dir.rename(train_dir)
-        
-        # 생성된 캐시 삭제 (다음을 위해)
-        if cache_file.exists():
-            print("  [Cache] Deleting generated cache")
-            cache_file.unlink()
-        
-        print("  [Label Swap] Restored!")
+TITLE = "YOLOv12 Scales Benchmark - KISA Overseas Person"
 
 
 def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
@@ -112,7 +70,7 @@ def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
         device=DEFAULT_DEVICE,
         half=False,
         save=False,
-        cache=False,  # 캐시 비활성화 (라벨 폴더 교체 시 필수)
+        cache=False,
     )
     summary = results.results_dict or {}
 
@@ -144,20 +102,11 @@ def run_val() -> Dict[str, Dict[str, float]]:
         name = model_config["name"]
         weights = model_config["weights"].resolve()
         classes = model_config["classes"]
-        use_fall0class = model_config.get("use_fall0class", False)
         
         print(f"[{i}/{len(MODELS)}] Evaluating: {name}")
         print(f"  Weights: {weights.name}")
         print(f"  Classes: {classes}")
-        if use_fall0class:
-            print(f"  Labels: train-fall0class (swapped)")
         
-        # fall0class 사용 시 자동 교체/원복
-        # if use_fall0class:
-        #     with use_fall0class_labels():
-        #         metrics = val(weights, data_yaml, classes)
-        # else:
-        #     metrics = val(weights, data_yaml, classes)
         metrics = val(weights, data_yaml, classes)
 
         results[name] = metrics
@@ -174,7 +123,6 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     run_dir = OUTPUT_ROOT / timestamp
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    # metrics = ["precision", "recall", "f1", "map50", "map50_95"]
     metrics = ["precision", "recall", "f1"]
     labels = list(results.keys())
     values = np.array([[results[label][metric] for label in labels] for metric in metrics])
@@ -218,10 +166,12 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
 
     with (run_dir / "metrics.json").open("w", encoding="utf-8") as fh:
         json.dump(results, fh, indent=2)
-
+    
+    print(f"Saved results to {run_dir}")
     return run_dir
 
 
 if __name__ == '__main__':
     result = run_val()
     save_benchmark_report(result)
+
