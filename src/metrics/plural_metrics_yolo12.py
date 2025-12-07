@@ -18,7 +18,7 @@ MODELS = [
     {
         "name": "YOLO12n",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12n.pt'),
-        "classes": [0], 
+        "classes": [0],
     },
     {
         "name": "YOLO12s",
@@ -43,7 +43,7 @@ MODELS = [
 ]
 
 DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
-OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics/yolo12_benchmark")
+OUTPUT_ROOT = Path("/src/metrics/yolo12_person")
 # Ensure output root exists
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 

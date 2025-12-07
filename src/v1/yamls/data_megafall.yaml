@@ -1,6 +1,6 @@
 path: /Users/jihunjang/Downloads/ust/dataset/train/megafallv2
-train: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/train_ins_100k.txt
-val: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/val_ins_100k.txt
+train: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/train_ins_100.txt
+val: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/val_ins_100.txt
 names:
   0: person
   1: fall_person

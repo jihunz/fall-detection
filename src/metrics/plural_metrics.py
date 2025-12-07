@@ -16,39 +16,43 @@ from ultralytics import YOLO
 # ============================================================================
 MODELS = [
     {
-        "name": "YOLO12n",
-        "weights": Path('/src/models/yolo12n.pt'),
-        "classes": [0],  # coco person 라벨로 fall 평가
-        "use_fall0class": True,  # train-fall0class 라벨 사용
-    },
-    {
         "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_100k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k/weights/best.pt'),
+        "classes": [0],  # Person 평가
     },
     {
         "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_10k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k/weights/best.pt'),
+        "classes": [0],  # Person 평가
     },
     {
         "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_5k/weights/best.pt'),
-        "classes": [0],  # fall_person 평가
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k/weights/best.pt'),
+        "classes": [0],  # Person 평가
     },
-    # {
-    #     "name": "2k",
-    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_2k/weights/best.pt'),
-    #     "classes": [0],  # fall_person 평가
-    # },
-    # {
-    #     "name": "1k",
-    #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_1k/weights/best.pt'),
-    #     "classes": [0],  # fall_person 평가
-    # },
+    {
+        "name": "2k",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k/weights/best.pt'),
+        "classes": [0],  # Person 평가
+    },
+    {
+        "name": "1k",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k/weights/best.pt'),
+        "classes": [0],  # Person 평가
+    },
+    {
+        "name": "500",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500/weights/best.pt'),
+        "classes": [0],  # Person 평가
+    },
+    {
+        "name": "250",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250/weights/best.pt'),
+        "classes": [0],  # Person 평가
+    },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_coco_val.yaml')
+DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 DEFAULT_CONF = 0.6
@@ -56,19 +60,20 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "FT based on Images - COCO2017 person"
+TITLE = "FT based on Instances - Kisa Overseas Person"
 
+# 라벨 디렉토리 (fall0class 교체용)
+LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")
 
 
 @contextmanager
 def use_fall0class_labels():
     """
     Context manager: train-fall0class 라벨을 임시로 train으로 교체
-
+    
     자동으로 원복되므로 안전합니다.
+    캐시 파일도 함께 삭제하여 오래된 경로 참조 방지합니다.
     """
-    # 라벨 디렉토리 (fall0class 교체용)
-    LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas/labels")
     train_dir = LABELS_BASE_DIR / "train"
     fall0_dir = LABELS_BASE_DIR / "train-fall0class"
     backup_dir = LABELS_BASE_DIR / "train_backup"
@@ -153,13 +158,12 @@ def run_val() -> Dict[str, Dict[str, float]]:
             print(f"  Labels: train-fall0class (swapped)")
         
         # fall0class 사용 시 자동 교체/원복
-        # if use_fall0class:
-        #     with use_fall0class_labels():
-        #         metrics = val(weights, data_yaml, classes)
-        # else:
-        #     metrics = val(weights, data_yaml, classes)
-        metrics = val(weights, data_yaml, classes)
-
+        if use_fall0class:
+            with use_fall0class_labels():
+                metrics = val(weights, data_yaml, classes)
+        else:
+            metrics = val(weights, data_yaml, classes)
+        
         results[name] = metrics
         
         print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
