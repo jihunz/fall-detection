@@ -18,37 +18,37 @@ MODELS = [
     {
         "name": "100k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "10k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "5k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "2k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "1k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "500",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
     {
         "name": "250",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250/weights/best.pt'),
-        "classes": [0],  # Person 평가
+        "classes": [0],
     },
 ]
 
@@ -60,7 +60,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "FT based on Instances - Kisa Overseas Person"
+TITLE = "Subset-based - Kisa Overseas Person"
 
 # 라벨 디렉토리 (fall0class 교체용)
 LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")

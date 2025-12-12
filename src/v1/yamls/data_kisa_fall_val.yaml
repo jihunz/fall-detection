@@ -1,5 +1,5 @@
 path: /Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall
-train: /Users/jihunjang/workspace/ust/fall-detection/src/v1/train_50k.txt
+train: #
 val: /Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/train.txt
 names:
   0: person

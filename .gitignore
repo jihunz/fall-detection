@@ -367,3 +367,6 @@ pyrightconfig.json
 /datasets/
 /content/
 /.venv/
+
+# Training results
+src/v1/result/
