@@ -17,42 +17,42 @@ from ultralytics import YOLO
 MODELS = [
     {
         "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "2k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "1k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "500",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500_v2/weights/best.pt'),
+        "classes": [1],
     },
     {
         "name": "250",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250/weights/best.pt'),
-        "classes": [0],
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250_v2/weights/best.pt'),
+        "classes": [1],
     },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
+DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_fall_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 DEFAULT_CONF = 0.6
@@ -60,7 +60,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "Subset-based - Kisa Overseas Person"
+TITLE = "Kisa Overseas Fall Person"
 
 # 라벨 디렉토리 (fall0class 교체용)
 LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")
