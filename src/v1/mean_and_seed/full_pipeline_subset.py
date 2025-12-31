@@ -22,8 +22,8 @@ from ultralytics import YOLO
 BASE_DIR = Path(__file__).resolve().parent
 YAMLS_DIR = BASE_DIR / 'yamls'
 DATA_CFG = YAMLS_DIR / 'data_megafall.yaml'
-DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12n.pt')
-METRICS_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/metrics')
+DEFAULT_WEIGHTS = Path('/src/models/yolo12n.pt')
+METRICS_DIR = Path('/src/metrics')
 
 # 100k 데이터셋 (소스)
 TRAIN_100K = YAMLS_DIR / 'train_ins_100k.txt'
@@ -393,6 +393,7 @@ if __name__ == '__main__':
     print("\n" + "=" * 60)
     print("모든 작업 완료!")
     print("=" * 60)
+
 
 
 

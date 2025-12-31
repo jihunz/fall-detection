@@ -11,47 +11,6 @@ import numpy as np
 from ultralytics import YOLO
 
 
-# ============================================================================
-# 설정: 평가할 모델들
-# ============================================================================
-MODELS = [
-    {
-        "name": "100k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "10k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "2k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "1k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "500",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500_v2/weights/best.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "250",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250_v2/weights/best.pt'),
-        "classes": [0],
-    },
-]
-
 DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
@@ -60,7 +19,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "Kisa Overseas Person"
+TITLE = "Train iteration - Kisa Overseas Person"
 
 # 라벨 디렉토리 (fall0class 교체용)
 LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")
@@ -142,53 +101,54 @@ def val(weights: Path, data_yaml: Path, classes: List[int], model_name: str, run
     }
 
 
-def run_val() -> tuple[Dict[str, Dict[str, float]], Path]:
-    """Run validation and return (results, run_dir)."""
+def run_val():
     results = {}
-    data_yaml = DATA_YAML.resolve()
-    
+    w_list = []
+    data_yaml = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml').resolve()
+
     # 타임스탬프 폴더 미리 생성
     timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
     run_dir = OUTPUT_ROOT / timestamp
     run_dir.mkdir(parents=True, exist_ok=True)
-    
-    print(f"\n{'='*80}")
-    print(f"Running validation on {len(MODELS)} models")
-    print(f"Output directory: {run_dir}")
-    print(f"{'='*80}\n")
-    
-    for i, model_config in enumerate(MODELS, 1):
-        name = model_config["name"]
-        weights = model_config["weights"].resolve()
-        classes = model_config["classes"]
-        use_fall0class = model_config.get("use_fall0class", False)
-        
-        print(f"[{i}/{len(MODELS)}] Evaluating: {name}")
-        print(f"  Weights: {weights.name}")
-        print(f"  Classes: {classes}")
-        if use_fall0class:
-            print(f"  Labels: train-fall0class (swapped)")
-        
-        # fall0class 사용 시 자동 교체/원복
-        # if use_fall0class:
-        #     with use_fall0class_labels():
-        #         metrics = val(weights, data_yaml, classes, name, run_dir)
-        # else:
-        #     metrics = val(weights, data_yaml, classes, name, run_dir)
-        metrics = val(weights, data_yaml, classes, name, run_dir)
-
-        results[name] = metrics
-        
-        print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
-        print()
-    
-    return results, run_dir
 
 
-def save_benchmark_report(results: Dict[str, Dict[str, float]], run_dir: Path) -> Path:
+    for item in ['1k', '500', '250']:
+        for i in range(1, 6):
+            name = f'{item}_{i}'
+            model = {
+                "name": name,
+                "weights": Path(
+                    f"/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_{item}_v2_mean{i}/weights/best.pt"),
+                "classes": [0],
+            }
+            name = model["name"]
+            weights = model["weights"].resolve()
+            classes = model["classes"]
+            metrics = val(weights, data_yaml, classes, name, run_dir)
+            w_list.append(weights)
+            results.setdefault(item, []).append(metrics)
+
+    return results, run_dir, w_list
+
+
+def compute_mean_results(results: Dict[str, List[Dict[str, float]]]) -> Dict[str, Dict[str, float]]:
+    """각 스케일 그룹의 5개 시드 결과를 평균 계산"""
+    mean_results = {}
+    
+    for scale, metrics_list in results.items():
+        # 각 metric별 평균 계산
+        mean_metrics = {}
+        for metric in ["precision", "recall", "f1", "map50", "map50_95"]:
+            values = [m[metric] for m in metrics_list]
+            mean_metrics[metric] = sum(values) / len(values)
+        mean_results[scale] = mean_metrics
+    
+    return mean_results
+
+
+def save_benchmark_report(results: Dict[str, Dict[str, float]], run_dir: Path, raw_results: Dict[str, List[Dict[str, float]]] = None) -> Path:
     """Persist metric summary (JSON + plot) under the given run directory."""
 
-    # metrics = ["precision", "recall", "f1", "map50", "map50_95"]
     metrics = ["precision", "recall", "f1"]
     labels = list(results.keys())
     values = np.array([[results[label][metric] for label in labels] for metric in metrics])
@@ -223,20 +183,38 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]], run_dir: Path) -
     upper_ylim = max(1.0, float(values.max()) + 0.05)
     ax.set_ylim(0, upper_ylim)
     ax.set_ylabel("Score", fontsize=12, fontweight='bold')
-    ax.set_title(TITLE, fontsize=13, fontweight='bold', pad=15)
+    ax.set_title(f"{TITLE} (Mean of 5 Trains)", fontsize=13, fontweight='bold', pad=15)
     ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1), fontsize=10)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
     fig.tight_layout()
-    fig.savefig(run_dir / "metrics.png", dpi=200)
+    fig.savefig(run_dir / "metrics_mean.png", dpi=200)
     plt.close(fig)
 
-    with (run_dir / "metrics.json").open("w", encoding="utf-8") as fh:
-        json.dump(results, fh, indent=2)
+    # JSON 저장: 평균 결과 + 원본 결과
+    save_data = {
+        "mean": results,
+        "raw": raw_results if raw_results else {}
+    }
+    with (run_dir / "metrics_mean.json").open("w", encoding="utf-8") as fh:
+        json.dump(save_data, fh, indent=2)
 
     return run_dir
 
 
 if __name__ == '__main__':
-    result, run_dir = run_val()
-    save_benchmark_report(result, run_dir)
+    # 1. 평가 실행
+    raw_results, run_dir, w_list = run_val()
+    
+    # 2. 평균 계산
+    mean_results = compute_mean_results(raw_results)
+    
+    # 3. 결과 출력
+    print("\n" + "=" * 60)
+    print("Mean Results (5 Seeds)")
+    print("=" * 60)
+    for scale, metrics in mean_results.items():
+        print(f"  {scale}: P={metrics['precision']:.4f}, R={metrics['recall']:.4f}, F1={metrics['f1']:.4f}")
+    
+    # 4. Plot 저장
+    save_benchmark_report(mean_results, run_dir, raw_results)
     print(f"\n✅ All results saved to: {run_dir}")
