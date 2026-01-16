@@ -18,41 +18,41 @@ MODELS = [
     {
         "name": "100k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_100k_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "10k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_10k_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "5k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_5k_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "2k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_2k_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "1k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_1k_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "500",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_500_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
     {
         "name": "250",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/train_ins_250_v2/weights/best.pt'),
-        "classes": [0],
+        "classes": [1],
     },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
+DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_fall_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 DEFAULT_CONF = 0.6
@@ -60,7 +60,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "Kisa Overseas Person"
+TITLE = "Kisa Overseas Fall Person"
 
 # 라벨 디렉토리 (fall0class 교체용)
 LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")
@@ -106,7 +106,7 @@ def use_fall0class_labels():
         print("  [Label Swap] Restored!")
 
 
-def val(weights: Path, data_yaml: Path, classes: List[int], model_name: str, run_dir: Path) -> Dict[str, float]:
+def val(weights: Path, data_yaml: Path, classes: List[int], model_name: str) -> Dict[str, float]:
     model = YOLO(str(weights))
     results = model.val(
         data=str(data_yaml),
@@ -120,7 +120,7 @@ def val(weights: Path, data_yaml: Path, classes: List[int], model_name: str, run
         save_txt=True,  # 예측 라벨 txt 저장
         save_conf=True,  # 신뢰도 저장
         cache=False,  # 캐시 비활성화 (라벨 폴더 교체 시 필수)
-        project=str(run_dir / "detect_results"),  # 벤치마크 폴더 하위에 저장
+        project=str(OUTPUT_ROOT / "detect_results"),  # 결과 저장 경로 지정
         name=model_name,  # 모델별 폴더 이름
         exist_ok=True,  # 기존 폴더 덮어쓰기
     )
@@ -142,19 +142,12 @@ def val(weights: Path, data_yaml: Path, classes: List[int], model_name: str, run
     }
 
 
-def run_val() -> tuple[Dict[str, Dict[str, float]], Path]:
-    """Run validation and return (results, run_dir)."""
+def run_val() -> Dict[str, Dict[str, float]]:
     results = {}
     data_yaml = DATA_YAML.resolve()
     
-    # 타임스탬프 폴더 미리 생성
-    timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
-    run_dir = OUTPUT_ROOT / timestamp
-    run_dir.mkdir(parents=True, exist_ok=True)
-    
     print(f"\n{'='*80}")
     print(f"Running validation on {len(MODELS)} models")
-    print(f"Output directory: {run_dir}")
     print(f"{'='*80}\n")
     
     for i, model_config in enumerate(MODELS, 1):
@@ -170,23 +163,25 @@ def run_val() -> tuple[Dict[str, Dict[str, float]], Path]:
             print(f"  Labels: train-fall0class (swapped)")
         
         # fall0class 사용 시 자동 교체/원복
-        # if use_fall0class:
-        #     with use_fall0class_labels():
-        #         metrics = val(weights, data_yaml, classes, name, run_dir)
-        # else:
-        #     metrics = val(weights, data_yaml, classes, name, run_dir)
-        metrics = val(weights, data_yaml, classes, name, run_dir)
-
+        if use_fall0class:
+            with use_fall0class_labels():
+                metrics = val(weights, data_yaml, classes, name)
+        else:
+            metrics = val(weights, data_yaml, classes, name)
+        
         results[name] = metrics
         
         print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
         print()
     
-    return results, run_dir
+    return results
 
 
-def save_benchmark_report(results: Dict[str, Dict[str, float]], run_dir: Path) -> Path:
-    """Persist metric summary (JSON + plot) under the given run directory."""
+def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
+    """Persist metric summary (JSON + plot) under a timestamped directory."""
+    timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
+    run_dir = OUTPUT_ROOT / timestamp
+    run_dir.mkdir(parents=True, exist_ok=True)
 
     # metrics = ["precision", "recall", "f1", "map50", "map50_95"]
     metrics = ["precision", "recall", "f1"]
@@ -237,6 +232,5 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]], run_dir: Path) -
 
 
 if __name__ == '__main__':
-    result, run_dir = run_val()
-    save_benchmark_report(result, run_dir)
-    print(f"\n✅ All results saved to: {run_dir}")
+    result = run_val()
+    save_benchmark_report(result)
