@@ -14,7 +14,7 @@ YAMLS_DIR = BASE_DIR / 'yamls'
 RESULT_DIR = BASE_DIR / 'result'
 
 # 기본 가중치
-DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12n.pt')
+DEFAULT_WEIGHTS = Path('/src/models/nano/yolo12n.pt')
 
 # 훈련 순서: 100k → 10k → 5k
 TRAIN_CONFIGS = [
