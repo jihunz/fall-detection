@@ -10,44 +10,38 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ultralytics import YOLO
 
-
 # ============================================================================
-# 설정: 평가할 모델들 (YOLOv12 Scale Benchmark)
+# 설정: 평가할 모델들
 # ============================================================================
 MODELS = [
     {
+        "name": "YOLO8n",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/nano/yolov8n.pt'),
+        "classes": [0],
+    },
+    {
+        "name": "YOLO11n",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/nano/yolo11n.pt'),
+        "classes": [0],
+    },
+    {
         "name": "YOLO12n",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12n.pt'),
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/nano/yolo12n.pt'),
         "classes": [0],
     },
     {
-        "name": "YOLO12s",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12s.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "YOLO12m",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12m.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "YOLO12l",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12l.pt'),
-        "classes": [0],
-    },
-    {
-        "name": "YOLO12x",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/yolo12x.pt'),
+        "name": "YOLO26n",
+        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/models/nano/yolo26n.pt'),
         "classes": [0],
     },
 ]
 
 DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_kisa_person_val.yaml')
-OUTPUT_ROOT = Path("/src/metrics/yolo12_person")
+OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics/yolo-person")
 # Ensure output root exists
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-DEFAULT_CONF = 0.001 # Low conf for PR curve calculation usually, but metrics returns best f1 at given conf. 
+DEFAULT_CONF = 0.001  # Low conf for PR curve calculation usually, but metrics returns best f1 at given conf.
 # Using 0.001 is standard for calculating mAP, but val() function uses specific conf.
 # The original script used 0.6. I will stick to the original script's default unless I see reason to change.
 # Original: DEFAULT_CONF = 0.6
@@ -56,7 +50,7 @@ DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "YOLOv12 Scales Benchmark - KISA Overseas Person"
+TITLE = "YOLO Nano Scales Benchmark - KISA Overseas Person"
 
 
 def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
@@ -93,27 +87,24 @@ def val(weights: Path, data_yaml: Path, classes: List[int]) -> Dict[str, float]:
 def run_val() -> Dict[str, Dict[str, float]]:
     results = {}
     data_yaml = DATA_YAML.resolve()
-    
-    print(f"\n{'='*80}")
-    print(f"Running validation on {len(MODELS)} models")
-    print(f"{'='*80}\n")
-    
-    for i, model_config in enumerate(MODELS, 1):
-        name = model_config["name"]
-        weights = model_config["weights"].resolve()
-        classes = model_config["classes"]
-        
-        print(f"[{i}/{len(MODELS)}] Evaluating: {name}")
-        print(f"  Weights: {weights.name}")
-        print(f"  Classes: {classes}")
-        
-        metrics = val(weights, data_yaml, classes)
 
-        results[name] = metrics
-        
-        print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
-        print()
-    
+    for i, model_config in enumerate(MODELS, 1):
+        for k in range(1, 11):
+            name = model_config["name"]
+            weights = model_config["weights"].resolve()
+            classes = model_config["classes"]
+
+            print(f"[{i}/{len(MODELS)}] Evaluating: {name}")
+            print(f"  Weights: {weights.name}")
+            print(f"  Classes: {classes}")
+
+            metrics = val(weights, data_yaml, classes)
+
+            results.setdefault(name, {})
+            results[name][k] = metrics
+
+            print(f"  Results: P={metrics['precision']:.3f}, R={metrics['recall']:.3f}, F1={metrics['f1']:.3f}")
+            print()
     return results
 
 
@@ -128,17 +119,17 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
     values = np.array([[results[label][metric] for label in labels] for metric in metrics])
 
     x = np.arange(len(metrics))
-    
+
     # 동적 width 계산: 라벨 개수에 반비례
     width = min(0.8 / len(labels), 0.35)
-    
+
     # 동적 figure 크기: 라벨 많을수록 넓게
     fig_width = max(10, 6 + len(labels) * 1.2)
     fig, ax = plt.subplots(figsize=(fig_width, 5))
-    
+
     # 동적 폰트 크기: 라벨 많을수록 작게
     value_fontsize = max(7, 10 - len(labels) * 0.4)
-    
+
     for idx, label in enumerate(labels):
         offset = (idx - (len(labels) - 1) / 2) * width
         bars = ax.bar(x + offset, values[:, idx], width, label=label)
@@ -166,12 +157,23 @@ def save_benchmark_report(results: Dict[str, Dict[str, float]]) -> Path:
 
     with (run_dir / "metrics.json").open("w", encoding="utf-8") as fh:
         json.dump(results, fh, indent=2)
-    
+
     print(f"Saved results to {run_dir}")
     return run_dir
 
 
+def get_mean(result):
+    metrics_keys = ['precision', 'recall', 'f1', 'map50', 'map50_95']
+    for model_name, item in result.items():
+        mean = {
+            k: sum(n[k] for n in item.values()) / len(item)
+            for k in metrics_keys
+        }
+        item['mean'] = mean
+
+
 if __name__ == '__main__':
     result = run_val()
-    save_benchmark_report(result)
-
+    get_mean(result)
+    print(result)
+    # save_benchmark_report(result)
