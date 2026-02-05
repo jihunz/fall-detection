@@ -19,12 +19,12 @@ def load_data():
     """metrics_mean.json 파일들 로드"""
     return {
         'fall': {
-            'nano': json.loads((METRICS_ROOT / 'yolo-fall/nano/metrics_mean.json').read_text()),
-            'small': json.loads((METRICS_ROOT / 'yolo-fall/small/metrics_mean.json').read_text()),
+            'nano': json.loads((METRICS_ROOT / 'yolo-vfp-fall/nano/metrics_mean.json').read_text()),
+            # 'small': json.loads((METRICS_ROOT / 'yolo-vfp-fall/small/metrics_mean.json').read_text()),
         },
         'person': {
-            'nano': json.loads((METRICS_ROOT / 'yolo-person/nano/metrics_mean.json').read_text()),
-            'small': json.loads((METRICS_ROOT / 'yolo-person/small/metrics_mean.json').read_text()),
+            'nano': json.loads((METRICS_ROOT / 'yolo-vfp-person/nano/metrics_mean.json').read_text()),
+            # 'small': json.loads((METRICS_ROOT / 'yolo-person/small/metrics_mean.json').read_text()),
         }
     }
 
@@ -36,7 +36,7 @@ def create_academic_table(ax, category_data, title, columns):
     
     # 테이블 데이터 준비
     table_rows = []
-    for scale_key, scale_name in [('nano', 'Nano'), ('small', 'Small')]:
+    for scale_key, scale_name in [('nano', 'Nano')]:
         metrics = category_data[scale_key]
         models = list(metrics.keys())
         for i, model in enumerate(models):

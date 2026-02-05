@@ -5,3 +5,13 @@ val: /Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/val_ins_2k_seed3
 names:
   0: person
   1: fall_person
+  2: bicycle
+  3: car
+  4: motorcycle
+  5: airplane
+  6: bus
+  7: train
+  8: truck
+  9: boat
+  10: traffic light
+  11: fire hydrant

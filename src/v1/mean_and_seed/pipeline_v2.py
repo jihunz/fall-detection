@@ -207,10 +207,10 @@ def train_all():
 
 
 # ============================================================
-# Phase 3: 평가 (plural_metrics.py 기반)
+# Phase 3: 평가 (finetuned.py 기반)
 # ============================================================
 def val_model(weights: Path, data_yaml: Path, classes: list) -> dict:
-    """단일 모델 평가 (plural_metrics.py val 함수 기반)"""
+    """단일 모델 평가 (finetuned.py val 함수 기반)"""
     model = YOLO(str(weights))
     results = model.val(
         data=str(data_yaml),
@@ -236,7 +236,7 @@ def val_model(weights: Path, data_yaml: Path, classes: list) -> dict:
 
 
 def save_eval_report(results: dict, title: str, prefix: str) -> Path:
-    """평가 결과 저장 (plural_metrics.py save_benchmark_report 기반)"""
+    """평가 결과 저장 (finetuned.py save_benchmark_report 기반)"""
     timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
     run_dir = METRICS_DIR / f"{prefix}_{timestamp}"
     run_dir.mkdir(parents=True, exist_ok=True)
