@@ -28,39 +28,39 @@ MODELS = [
     {
         "name": "5k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_5k/weights/best.pt'),
-        "classes": [1],
+        "classes": [0],
     },
     # {
     #     "name": "2k",
     #     "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_2k/weights/best.pt'),
-    #     "classes": [1],
+    #     "classes": [0],
     # },
     {
         "name": "1k",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_1k/weights/best.pt'),
-        "classes": [1],
+        "classes": [0],
     },
     {
         "name": "500",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_500/weights/best.pt'),
-        "classes": [1],
+        "classes": [0],
     },
     {
         "name": "250",
         "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_250/weights/best.pt'),
-        "classes": [1],
+        "classes": [0],
     },
 ]
 
 DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_gopr_fall_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
-DEFAULT_CONF = 0.6
+DEFAULT_CONF = 0.001
 DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = "mps"
 
-TITLE = "VFP290K Fall"
+TITLE = "VFP290K Person"
 
 # 라벨 디렉토리 (fall0class 교체용)
 LABELS_BASE_DIR = Path("/Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-fall/labels")

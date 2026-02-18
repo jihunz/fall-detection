@@ -58,7 +58,7 @@ EVAL_TYPES = {
 
 # 평가 설정
 NUM_RUNS = 1
-DEFAULT_CONF = 0.6
+DEFAULT_CONF = 0.001
 DEFAULT_IOU = 0.6
 DEFAULT_IMGSZ = 640
 DEFAULT_DEVICE = 'mps'
@@ -129,10 +129,15 @@ def val(weights: Path, data_yaml: Path, classes: List[int],
         save_dir: Path = None, model_name: str = None) -> Dict[str, float]:
     """단일 모델 평가"""
     model = YOLO(str(weights))
+    
+    # YOLO26은 end-to-end (NMS-free) 모델이므로 val 기본 conf 사용
+    is_yolo26 = '26' in str(weights.name)
+    conf = 0.001 if is_yolo26 else DEFAULT_CONF
+    
     results = model.val(
         data=str(data_yaml),
         classes=classes,
-        conf=DEFAULT_CONF,
+        conf=conf,
         iou=DEFAULT_IOU,
         imgsz=DEFAULT_IMGSZ,
         device=DEFAULT_DEVICE,
@@ -163,7 +168,6 @@ def val(weights: Path, data_yaml: Path, classes: List[int],
 
 
 def run_evaluation(scale: str, eval_type: str) -> Dict[str, Dict]:
-    """특정 스케일, 평가타입에 대해 10회 반복 평가"""
     scale_config = SCALES[scale]
     eval_config = EVAL_TYPES[eval_type]
     
