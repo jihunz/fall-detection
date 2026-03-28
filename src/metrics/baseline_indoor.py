@@ -55,8 +55,8 @@ SCALES = {
         'models': [
             {'name': 'YOLOv8n', 'weights': MODELS_DIR / 'nano/yolov8n.pt'},
             {'name': 'YOLO11n', 'weights': MODELS_DIR / 'nano/yolo11n.pt'},
-            # {'name': 'YOLO12n', 'weights': MODELS_DIR / 'nano/yolo12n.pt'},
-            # {'name': 'YOLO26n', 'weights': MODELS_DIR / 'nano/yolo26n.pt'},
+            {'name': 'YOLO12n', 'weights': MODELS_DIR / 'nano/yolo12n.pt'},
+            {'name': 'YOLO26n', 'weights': MODELS_DIR / 'nano/yolo26n.pt'},
         ]
     },
 }

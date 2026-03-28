@@ -56,12 +56,13 @@ DEFAULT_WEIGHTS = Path('/Users/jihunjang/workspace/ust/fall-detection/src/models
 
 # 스케일별 config — 작은 순서대로 정렬
 SCALES = {
-    'indoor_1percent':   str(BASE_DIR / 'yamls/data_indoor_375.yaml'),
-    'indoor_5percent':   str(BASE_DIR / 'yamls/data_indoor_1876.yaml'),
-    'indoor_10percent':  str(BASE_DIR / 'yamls/data_indoor_3753.yaml'),
-    'indoor_25percent':  str(BASE_DIR / 'yamls/data_indoor_9382.yaml'),
-    'indoor_50percent':  str(BASE_DIR / 'yamls/data_indoor_18764.yaml'),
-    # 'indoor_100percent': str(BASE_DIR / 'yamls/data_indoor_37527.yaml'),  # 100% — 필요시 주석 해제
+    'indoor_100percent': str(BASE_DIR / 'yamls/data_indoor_37527.yaml'),  # resume from epoch 92
+    'indoor_75percent':  str(BASE_DIR / 'yamls/data_indoor_28145.yaml'),  # new training
+    # 'indoor_1percent':   str(BASE_DIR / 'yamls/data_indoor_375.yaml'),
+    # 'indoor_5percent':   str(BASE_DIR / 'yamls/data_indoor_1876.yaml'),
+    # 'indoor_10percent':  str(BASE_DIR / 'yamls/data_indoor_3753.yaml'),
+    # 'indoor_25percent':  str(BASE_DIR / 'yamls/data_indoor_9382.yaml'),
+    # 'indoor_50percent':  str(BASE_DIR / 'yamls/data_indoor_18764.yaml'),
 }
 
 COMMON_ARGS = dict(
@@ -84,17 +85,40 @@ COMMON_ARGS = dict(
 # ============================================================================
 # 훈련 로직
 # ============================================================================
+def get_last_epoch(name: str) -> int:
+    """results.csv에서 마지막 완료 epoch 번호 반환 (-1이면 없음)"""
+    results_csv = Path(RESULT_DIR) / name / 'results.csv'
+    if not results_csv.exists():
+        return -1
+    lines = results_csv.read_text().strip().split('\n')
+    if not lines:
+        return -1
+    try:
+        return int(lines[-1].split(',')[0].strip())
+    except (ValueError, IndexError):
+        return -1
+
+
 def is_completed(name: str) -> bool:
-    """이미 완료된 스케일인지 확인 (best.pt 존재 여부)"""
+    """
+    이미 완료된 스케일인지 확인.
+    best.pt가 존재하고 마지막 epoch이 설정된 epochs-1에 도달한 경우만 완료로 판정.
+    """
     best_pt = Path(RESULT_DIR) / name / 'weights' / 'best.pt'
-    return best_pt.exists()
+    if not best_pt.exists():
+        return False
+    last_epoch = get_last_epoch(name)
+    target_epoch = COMMON_ARGS['epochs'] - 1  # 0-indexed
+    if last_epoch < target_epoch:
+        print(f'  [INFO] {name}: best.pt exists but only reached epoch {last_epoch}/{target_epoch}')
+        return False
+    return True
 
 
 def can_resume(name: str) -> bool:
-    """중단된 학습을 이어서 할 수 있는지 확인"""
+    """중단된 학습을 이어서 할 수 있는지 확인 (last.pt 존재 여부)"""
     last_pt = Path(RESULT_DIR) / name / 'weights' / 'last.pt'
-    args_yaml = Path(RESULT_DIR) / name / 'args.yaml'
-    return last_pt.exists() and args_yaml.exists()
+    return last_pt.exists()
 
 
 def train_scale(name: str, data_yaml: str) -> None:

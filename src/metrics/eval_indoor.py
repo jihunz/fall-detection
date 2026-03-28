@@ -32,7 +32,8 @@ MODELS = [
     {"name": "10percent",  "scale": 3753,  "weights": V2_RESULT_DIR / 'indoor_10percent/weights/best.pt'},
     {"name": "25percent",  "scale": 9382,  "weights": V2_RESULT_DIR / 'indoor_25percent/weights/best.pt'},
     {"name": "50percent",  "scale": 18764, "weights": V2_RESULT_DIR / 'indoor_50percent/weights/best.pt'},
-    # {"name": "100percent", "scale": 37527, "weights": V2_RESULT_DIR / 'indoor_100percent/weights/best.pt'},
+    {"name": "75percent",  "scale": 18764, "weights": V2_RESULT_DIR / 'indoor_50percent/weights/best.pt'},
+    {"name": "100percent", "scale": 37527, "weights": V2_RESULT_DIR / 'indoor_100percent/weights/best.pt'},
 ]
 
 DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/data_indoor_eval.yaml')

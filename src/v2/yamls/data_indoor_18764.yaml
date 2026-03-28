@@ -1,6 +1,6 @@
 path: /Users/jihunjang/Downloads/indoor-refined
 train: /Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/train_indoor_18764.txt
-val: /Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/test_indoor.txt
+val: /Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/val_indoor.txt
 names:
   0: person
   1: fall
