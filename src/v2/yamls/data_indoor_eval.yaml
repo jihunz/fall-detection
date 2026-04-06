@@ -1,4 +1,4 @@
-path: /Users/jihunjang/Downloads/indoor-refined
+path: /Users/jihunjang/Downloads/ust/indoor-refined
 train: /Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/train_indoor_37527.txt
 val: /Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/test_indoor.txt
 names:

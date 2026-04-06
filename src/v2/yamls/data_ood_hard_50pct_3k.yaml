@@ -1,0 +1,6 @@
+path: /Users/jihunjang/workspace/ust/fall-detection/src/v2/datasets_v2/ood_hard_50pct_3k
+train: train/images
+val: /Users/jihunjang/Downloads/ust/indoor-refined/val/images
+names:
+  0: person
+  1: fall

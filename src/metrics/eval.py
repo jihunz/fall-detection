@@ -1,12 +1,12 @@
 """
-Indoor-Refined 스케일별 모델 평가 스크립트
+스케일별 모델 평가 스크립트
 - person(class 0), fall(class 1) 각각 평가
 - Precision, Recall, F1, mAP50, mAP50-95
 - Scaling curve (log-scale X축) 시각화
 - 결과 JSON 저장
 
 Usage:
-  python eval_indoor.py
+  python eval.py
 """
 
 from __future__ import annotations
@@ -24,6 +24,8 @@ from ultralytics import YOLO
 # ============================================================================
 # 설정
 # ============================================================================
+EVAL_TARGET = 'outdoor'  # 평가 대상 ('indoor' / 'outdoor')
+
 V2_RESULT_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/result')
 
 MODELS = [
@@ -32,11 +34,11 @@ MODELS = [
     {"name": "10percent",  "scale": 3753,  "weights": V2_RESULT_DIR / 'indoor_10percent/weights/best.pt'},
     {"name": "25percent",  "scale": 9382,  "weights": V2_RESULT_DIR / 'indoor_25percent/weights/best.pt'},
     {"name": "50percent",  "scale": 18764, "weights": V2_RESULT_DIR / 'indoor_50percent/weights/best.pt'},
-    {"name": "75percent",  "scale": 18764, "weights": V2_RESULT_DIR / 'indoor_50percent/weights/best.pt'},
+    {"name": "75percent",  "scale": 28145, "weights": V2_RESULT_DIR / 'indoor_75percent/weights/best.pt'},
     {"name": "100percent", "scale": 37527, "weights": V2_RESULT_DIR / 'indoor_100percent/weights/best.pt'},
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/data_indoor_eval.yaml')
+DATA_YAML = Path(f'/Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/data_{EVAL_TARGET}_eval.yaml')
 OUTPUT_ROOT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/metrics')
 
 EVAL_TYPES = {
@@ -121,7 +123,7 @@ def save_bar_plot(results: Dict[str, Dict[str, float]], eval_type: str, save_dir
     ax.set_xticklabels([m.upper() for m in metrics], fontsize=11)
     ax.set_ylim(0, max(1.0, float(values.max()) + 0.05))
     ax.set_ylabel("Score", fontsize=12, fontweight='bold')
-    ax.set_title(f"Indoor-Refined {eval_type.capitalize()}", fontsize=13, fontweight='bold', pad=15)
+    ax.set_title(f"{EVAL_TARGET.capitalize()} {eval_type.capitalize()}", fontsize=13, fontweight='bold', pad=15)
     ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1), fontsize=10)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
     fig.tight_layout()
@@ -157,7 +159,7 @@ def save_scaling_curve(all_results: Dict[str, Dict[str, Dict[str, float]]],
         ax.set_xscale('log')
         ax.set_xlabel('Training images (log scale)', fontsize=11)
         ax.set_ylabel('Score', fontsize=11)
-        ax.set_title(f'Scaling Curve — {eval_type.capitalize()}', fontsize=13, fontweight='bold')
+        ax.set_title(f'Scaling Curve ({EVAL_TARGET.capitalize()}) —{eval_type.capitalize()}', fontsize=13, fontweight='bold')
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         ax.set_ylim(0, 1.05)
@@ -173,7 +175,7 @@ def save_scaling_curve(all_results: Dict[str, Dict[str, Dict[str, float]]],
 # ============================================================================
 def main():
     timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
-    base_dir = OUTPUT_ROOT / f"eval_indoor_{timestamp}"
+    base_dir = OUTPUT_ROOT / f"eval_{EVAL_TARGET}_{timestamp}"
     data_yaml = DATA_YAML.resolve()
 
     # 존재하는 모델만 필터
@@ -183,7 +185,7 @@ def main():
         return
 
     print(f"{'=' * 80}")
-    print(f"Indoor-Refined Scale Evaluation")
+    print(f"{EVAL_TARGET.capitalize()} Scale Evaluation")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Models: {[m['name'] for m in available_models]}")
     print(f"Output: {base_dir}")
