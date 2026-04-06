@@ -44,7 +44,7 @@ DATASET_CONFIG = {
     'indoor': {
         'labels_dir': Path('/Users/jihunjang/Downloads/indoor-refined/val/labels'),
         'data_yaml': V2_YAMLS_DIR / 'data_indoor_eval.yaml',
-        'output_prefix': 'yolo-indoor',
+        'output_prefix': 'yolo_id',
         'eval_name': 'Indoor-Refined',
     },
 }
