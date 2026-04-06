@@ -5,9 +5,9 @@ YOLO Baseline 평가 스크립트 (GOPR / Indoor-Refined 전환 가능)
 - 학술 논문 스타일 표(PNG) + Bar Plot + JSON 저장
 
 Usage:
-  python baseline_indoor.py                  # DATASET 변수에 따라 실행
-  python baseline_indoor.py --dataset indoor # CLI로 데이터셋 지정
-  python baseline_indoor.py --dataset gopr
+  python yolo_id.py                  # DATASET 변수에 따라 실행
+  python yolo_id.py --dataset indoor # CLI로 데이터셋 지정
+  python yolo_id.py --dataset gopr
 """
 
 from __future__ import annotations
