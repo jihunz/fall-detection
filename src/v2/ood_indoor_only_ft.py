@@ -132,7 +132,7 @@ def can_resume(name: str) -> bool:
 
 
 def delete_labels_cache():
-    datasets_dir = BASE_DIR / 'datasets_v2'
+    datasets_dir = Path('/Users/jihunjang/Downloads/ust/hard-negative-exp')
     if datasets_dir.exists():
         for cache in datasets_dir.rglob('*.cache'):
             try:

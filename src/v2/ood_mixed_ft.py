@@ -78,8 +78,8 @@ def can_resume(name: str) -> bool:
 
 
 def delete_labels_cache():
-    """labels.cache 삭제 — datasets_v2/ 하위"""
-    datasets_dir = BASE_DIR / 'datasets_v2'
+    """labels.cache 삭제 — hard-negative-exp/ 하위"""
+    datasets_dir = Path('/Users/jihunjang/Downloads/ust/hard-negative-exp')
     if datasets_dir.exists():
         for cache in datasets_dir.rglob('*.cache'):
             try:

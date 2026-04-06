@@ -370,3 +370,6 @@ pyrightconfig.json
 
 # Training results
 src/v1/result/
+
+# Model weights
+src/models/

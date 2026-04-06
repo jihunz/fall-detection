@@ -1,4 +1,4 @@
-path: /Users/jihunjang/workspace/ust/fall-detection/src/v2/datasets_v2/indoor_only_3k
+path: /Users/jihunjang/Downloads/ust/hard-negative-exp/indoor_only_3k
 train: train/images
 val: /Users/jihunjang/Downloads/ust/indoor-refined/val/images
 names:
