@@ -23,23 +23,23 @@ from ultralytics import YOLO
 MODELS = [
     {
         "name": "5k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_5k/weights/best.pt'),
+        "weights": Path('/src/train-v1/result/gopr_5k/weights/best.pt'),
     },
     {
         "name": "1k",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_1k/weights/best.pt'),
+        "weights": Path('/src/train-v1/result/gopr_1k/weights/best.pt'),
     },
     {
         "name": "500",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_500/weights/best.pt'),
+        "weights": Path('/src/train-v1/result/gopr_500/weights/best.pt'),
     },
     {
         "name": "250",
-        "weights": Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_250/weights/best.pt'),
+        "weights": Path('/src/train-v1/result/gopr_250/weights/best.pt'),
     },
 ]
 
-DATA_YAML = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls/data_gopr_fall_val.yaml')
+DATA_YAML = Path('/src/train-v1/yamls/data_gopr_fall_val.yaml')
 OUTPUT_ROOT = Path("/Users/jihunjang/workspace/ust/fall-detection/src/metrics")
 
 EVAL_TYPES = {

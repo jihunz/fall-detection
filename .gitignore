@@ -369,7 +369,7 @@ pyrightconfig.json
 /.venv/
 
 # Training results
-src/v1/result/
+src/train-v1/result/
 
 # Model weights
 src/models/

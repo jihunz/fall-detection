@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO('/Users/jihunjang/workspace/ust/fall-detection/src/v1/result/gopr_250/weights/best.pt')  # 검증/추론 모델 로드
+model = YOLO('/src/train-v1/result/gopr_250/weights/best.pt')  # 검증/추론 모델 로드
 
 results = model.predict(
     source="/Users/jihunjang/Downloads/ust/dataset/train/gopr/images/test",  # 평가할 이미지 폴더/파일

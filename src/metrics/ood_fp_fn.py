@@ -25,7 +25,7 @@ from ultralytics import YOLO
 # ============================================================================
 # 설정
 # ============================================================================
-V2_RESULT_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/result')
+V2_RESULT_DIR = Path('/src/train-v2/result')
 
 MODELS = [
     {"name": "1percent",   "scale": 375,   "weights": V2_RESULT_DIR / 'indoor_1percent/weights/best.pt'},

@@ -30,8 +30,8 @@ from ultralytics import YOLO
 DATASET = 'indoor'  # 'gopr' 또는 'indoor'
 
 MODELS_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/models')
-V1_YAMLS_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v1/yamls')
-V2_YAMLS_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls')
+V1_YAMLS_DIR = Path('/src/train-v1/yamls')
+V2_YAMLS_DIR = Path('/src/train-v2/yamls')
 OUTPUT_ROOT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/metrics')
 
 DATASET_CONFIG = {

@@ -26,7 +26,7 @@ from ultralytics import YOLO
 # ============================================================================
 EVAL_TARGET = 'outdoor'  # 평가 대상 ('indoor' / 'outdoor')
 
-V2_RESULT_DIR = Path('/Users/jihunjang/workspace/ust/fall-detection/src/v2/result')
+V2_RESULT_DIR = Path('/src/train-v2/result')
 
 MODELS = [
     {"name": "1percent",   "scale": 375,   "weights": V2_RESULT_DIR / 'indoor_1percent/weights/best.pt'},
@@ -38,7 +38,7 @@ MODELS = [
     {"name": "100percent", "scale": 37527, "weights": V2_RESULT_DIR / 'indoor_100percent/weights/best.pt'},
 ]
 
-DATA_YAML = Path(f'/Users/jihunjang/workspace/ust/fall-detection/src/v2/yamls/data_{EVAL_TARGET}_eval.yaml')
+DATA_YAML = Path(f'/src/train-v2/yamls/data_{EVAL_TARGET}_eval.yaml')
 OUTPUT_ROOT = Path('/Users/jihunjang/workspace/ust/fall-detection/src/metrics')
 
 EVAL_TYPES = {
