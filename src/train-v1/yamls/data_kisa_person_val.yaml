@@ -1,8 +1,0 @@
-path: /Users/jihunjang/Downloads/ust/dataset/val/kisa-overseas-person
-train: # 
-val: /Users/jihunjang/workspace/ust/fall-detection/src/train-v1/yamls/val_kisa_person.txt
-test: # 
-
-names:
-  0: person
-
